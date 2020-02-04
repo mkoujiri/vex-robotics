@@ -80,6 +80,7 @@ void MotorGroup::run(int button_one, int button_two)
 	if(threshhold.in_pos(get_average_position()))
 	{
 		voltage = threshhold.speed;
+		std::cout << "in threshhold" << std::endl;
 	}
 
 	if(button_one)
@@ -95,6 +96,10 @@ void MotorGroup::run(int button_one, int button_two)
 		{
 			motors[i]->move(voltage[1]);
 		}
+	}
+	else
+	{
+		stop();
 	}
 }
 
