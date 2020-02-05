@@ -25,8 +25,11 @@ class MotorGroup
 	void run(std::vector<int> speed);
 	void run(int speed);
 	void run(int button_one, int button_two);
-
 	void stop();
+
+	// pid execution
+	void set_pid_constants(double kP, double kI, double kD);
+	void move_pid(int position_delta);
 
 	// movement speeds
 	void set_threshhold(int pos_start, int pos_end, std::vector<int> speed);
@@ -40,6 +43,8 @@ class MotorGroup
 	std::vector<pros::Motor*> motors;
 	std::vector<int> directional_speeds;
 	PositionalSpeed threshhold = { 0 };
+
+	double kP, kI, kD;
 };
 
 #endif

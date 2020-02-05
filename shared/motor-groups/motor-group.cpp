@@ -113,6 +113,36 @@ void MotorGroup::stop()
 	}
 }
 
+void MotorGroup::set_pid_constants(double kP, double kI, double kD)
+{
+	/*
+	   Assigns the constants of motor group that will
+	   be used in PID (proportional-integral-derivative)
+	   controller.
+
+	   kP is the proportional constants.
+	   kI is the integral scaling constant.
+	   kD is the derivative scaling constant.
+	*/
+
+	this->kP = kP;
+	this->kI = kI;
+	this->kD = kD;
+}
+
+void MotorGroup::move_pid(int position_delta)
+{
+	/*
+	   Moves motor group to position based off of PID control.
+
+	   Uses PID (proportional-integral-derivative) controllers
+	   to accurately and smoothly move to given position.
+	*/
+
+	clear_encoders();
+	// TODO implement move_pid
+}
+
 void MotorGroup::set_threshhold(int start_pos, int end_pos,
 								std::vector<int> speeds)
 {
