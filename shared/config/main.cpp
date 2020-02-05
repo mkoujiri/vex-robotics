@@ -20,6 +20,14 @@ pros::Motor right_ramp(4, true);
 // motor group based off of ports [3, 4]
 MotorGroup ramp({ &left_ramp, &right_ramp }, { 40, -60 });
 
+// left scooper motor is normal direction
+pros::Motor left_scooper(12, false);
+// right scooper motor is reversed direction
+pros::Motor right_scooper(13, true);
+
+// motor group based off of ports [12, 13]
+MotorGroup scooper({ &left_scooper, &right_scooper }, { 100, -40 });
+
 void initialize()
 {
 	/*
@@ -35,7 +43,7 @@ void initialize()
 	// user initialization
 	drive.set_brake(BRAKE);
 	ramp.set_brake(BRAKE);
-	ramp.set_threshhold(1500, 1600, { 30, -60 });
+	ramp.set_threshhold(1500, 2000, { 20, -60 });
 }
 
 void competition_initialize()
@@ -66,6 +74,7 @@ void opcontrol()
 
 		// run ramp based off of x and b button
 		ramp.run(master.get_digital(X), master.get_digital(B));
+		scooper.run(master.get_digital(R_BUMPER), master.get_digital(R_TRIGGER));
 
 		pros::delay(10);
 	}
