@@ -32,7 +32,7 @@ class MotorGroup
 	void move_pid(int position_delta);
 
 	// movement speeds
-	void set_threshhold(int pos_start, int pos_end, std::vector<int> speed);
+	void set_threshold(int pos_start, int pos_end, std::vector<int> speed);
 	void set_brake(BRAKE_MODE mode);
 
 	// encoders
@@ -42,7 +42,7 @@ class MotorGroup
 	private:
 	std::vector<pros::Motor*> motors;
 	std::vector<int> directional_speeds;
-	PositionalSpeed threshhold = { 0 };
+	PositionalSpeed threshold = { 0 };
 
 	double kP, kI, kD;
 };

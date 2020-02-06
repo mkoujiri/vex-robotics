@@ -43,7 +43,7 @@ void initialize()
 	// user initialization
 	drive.set_brake(BRAKE);
 	ramp.set_brake(BRAKE);
-	ramp.set_threshhold(1500, 2000, { 20, -60 });
+	ramp.set_threshold(1500, 2000, { 20, -60 });
 }
 
 void competition_initialize()
@@ -74,7 +74,8 @@ void opcontrol()
 
 		// run ramp based off of x and b button
 		ramp.run(master.get_digital(X), master.get_digital(B));
-		scooper.run(master.get_digital(R_BUMPER), master.get_digital(R_TRIGGER));
+		scooper.run(master.get_digital(R_BUMPER),
+					master.get_digital(R_TRIGGER));
 
 		pros::delay(10);
 	}

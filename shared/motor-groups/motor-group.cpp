@@ -31,14 +31,14 @@ void MotorGroup::run(std::vector<int> speed)
 {
 	/*
 	   A function that takes a list of the speeds at
-	   which all the motors in the motor grop will run.
+	   which all the motors in the motor group will run.
 
 	   Most useful when writing autonomous code and
 	   you must have the rates seperated.  Can also be
 	   useful when using joysticks to control motors
 	   seperately.
 
-	   NOTE: This function ignores all threshholds.
+	   NOTE: This function ignores all thresholds.
 	*/
 
 	for(int i = 0; i < motors.size(); i++)
@@ -56,7 +56,7 @@ void MotorGroup::run(int speed)
 	   Most useful when using buttons and driving motors
 	   the same direction at the same rate.
 
-	   NOTE: This function ignores all threshholds.
+	   NOTE: This function ignores all thresholds.
 	*/
 
 	for(int i = 0; i < motors.size(); i++)
@@ -73,14 +73,14 @@ void MotorGroup::run(int button_one, int button_two)
 
 	   Used to control a grouping of motors bidirectionally
 	   based off of buttons and modifiers. Takes into account
-	   the threshholds set by user.
+	   the thresholds set by user.
 	*/
 
 	std::vector<int> voltage = directional_speeds;
-	if(threshhold.in_pos(get_average_position()))
+	if(threshold.in_pos(get_average_position()))
 	{
-		voltage = threshhold.speed;
-		std::cout << "in threshhold" << std::endl;
+		voltage = threshold.speed;
+		std::cout << "in threshold" << std::endl;
 	}
 
 	if(button_one)
@@ -148,20 +148,20 @@ void MotorGroup::move_pid(int position_delta)
 	// TODO implement move_pid
 }
 
-void MotorGroup::set_threshhold(int start_pos, int end_pos,
-								std::vector<int> speeds)
+void MotorGroup::set_threshold(int start_pos, int end_pos,
+							   std::vector<int> speeds)
 {
 	/*
 	   Takes the beginning of the threshold, the end of
-	   the threshhold and the rate that takes place in
-	   this threshhold.
+	   the threshold and the rate that takes place in
+	   this threshold.
 
 	   Used to control a segment of the position of the
 	   motors' speed. Only used when controlled by via
 	   buttons in the run(int, int) method.
 	*/
 
-	threshhold = PositionalSpeed{ start_pos, end_pos, speeds };
+	threshold = PositionalSpeed{ start_pos, end_pos, speeds };
 }
 
 void MotorGroup::set_brake(BRAKE_MODE mode)
