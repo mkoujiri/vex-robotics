@@ -144,8 +144,45 @@ void MotorGroup::move_pid(int position_delta)
 	   to accurately and smoothly move to given position.
 	*/
 
+	// reset values of encoders
 	clear_encoders();
-	// TODO implement move_pid
+
+	// variables used in function
+	const int dT = 10;
+	int error;
+	int prev_error;
+	int power;
+	int integral;
+	int derivative;
+
+	// continue looping while we aren't at end position
+	while(abs(error) > 5)
+	{
+		// calculate error
+		error = position_delta - motors[0]->get_position();
+
+		// calculate integral
+		integral += error;
+
+		// limit integral (check in range or passed setpoint)
+		if(integral > 10000 || prev_error > 0 && error < 0 ||
+		   prev_error < 0 && error > 0 || error == 0)
+		{
+			integral = 0;
+		}
+
+		// calculate derivative
+		derivative = error - prev_error;
+		prev_error = error;
+
+		// execute at power
+		power = error * kP + integral * kI + derivative * kP;
+		run(power);
+
+		pros::delay(dT);
+	}
+
+	// TODO test function
 }
 
 void MotorGroup::set_threshold(int start_pos, int end_pos,
