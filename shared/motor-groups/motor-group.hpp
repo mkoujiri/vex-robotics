@@ -1,6 +1,12 @@
 #ifndef MOTOR_GROUP_HPP
 #define MOTOR_GROUP_HPP
 
+/*
+	The PositionalSpeed struct allows for a MotorGroup
+	object's speed to be controlled differently within
+	certain ranges of encoder readings.
+*/
+
 struct PositionalSpeed
 {
 	int pos_start;
@@ -13,6 +19,20 @@ struct PositionalSpeed
 			   pos < pos_start && pos > pos_end;
 	}
 };
+
+/*
+	The MotorGroup class maintains a set of multiple
+	pros::Motor objects.  It allows velocity based
+	movement and PID movement to complete a task
+	while maintaining an even distribution of
+	power specificied by the user.
+
+	Examples can include a drive train or a set
+	of motors lifting an arm.  The user would want
+	them to move synchronously so they can
+	be placed in a MotorGroup to assure that they
+	move as expected.
+*/
 
 class MotorGroup
 {
@@ -27,7 +47,7 @@ class MotorGroup
 	void run(int button_one, int button_two);
 	void stop();
 
-	// pid execution
+	// PID execution
 	void set_pid_constants(double kP, double kI, double kD);
 	void move_pid(int position_delta);
 
@@ -44,6 +64,7 @@ class MotorGroup
 	std::vector<int> directional_speeds;
 	PositionalSpeed threshold = { 0 };
 
+	// PID constants
 	double kP, kI, kD;
 };
 
