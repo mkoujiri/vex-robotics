@@ -1,3 +1,9 @@
+/*
+	The macros file makes code more simple to read
+	by abstracting from the definitions that the
+	pros api supplies.
+*/
+
 #define BRAKE_MODE pros::motor_brake_mode_e_t
 #define COAST	   pros::E_MOTOR_BRAKE_COAST
 #define HOLD	   pros::E_MOTOR_BRAKE_HOLD

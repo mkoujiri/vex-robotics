@@ -156,7 +156,7 @@ void MotorGroup::move_pid(int position_delta)
 	int derivative;
 
 	// continue looping while we aren't at end position
-	while(abs(error) > 5)
+	while(abs(error) > 2)
 	{
 		// calculate error
 		error = position_delta - motors[0]->get_position();
@@ -164,9 +164,10 @@ void MotorGroup::move_pid(int position_delta)
 		// calculate integral
 		integral += error;
 
+		bool passed_setpoint = prev_error > 0 && error < 0 ||
+							   prev_error < 0 && error > 0 || error == 0;
 		// limit integral (check in range or passed setpoint)
-		if(integral > 10000 || prev_error > 0 && error < 0 ||
-		   prev_error < 0 && error > 0 || error == 0)
+		if(integral > 10000 || passed_setpoint)
 		{
 			integral = 0;
 		}
@@ -179,6 +180,7 @@ void MotorGroup::move_pid(int position_delta)
 		power = error * kP + integral * kI + derivative * kP;
 		run(power);
 
+		// wait for poll rate of motors
 		pros::delay(dT);
 	}
 
@@ -246,7 +248,7 @@ void MotorGroup::clear_encoders()
 	   be zeroed.
 
 	   Used mostly when traveling from point a to
-	   point b independently of the start position.
+	   point b independent of the start position.
 	*/
 
 	for(pros::Motor* motor : motors)
