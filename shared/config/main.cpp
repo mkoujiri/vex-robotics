@@ -77,8 +77,7 @@ void opcontrol()
 	while(true)
 	{
 		// control drive train with joysticks
-		drive.run(
-			{ master.get_analog(L_ANALOG_Y), master.get_analog(R_ANALOG_Y) });
+		drive.run({ master.get_analog(JOY_LY), master.get_analog(JOY_RY) });
 
 		// control ramp based off of x and b button
 		ramp.run(master.get_digital(X), master.get_digital(B));
