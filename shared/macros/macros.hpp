@@ -1,3 +1,9 @@
+/*
+	The macros file makes code more simple to read
+	by abstracting from the definitions that the
+	pros api supplies.
+*/
+
 #define BRAKE_MODE pros::motor_brake_mode_e_t
 #define COAST	   pros::E_MOTOR_BRAKE_COAST
 #define HOLD	   pros::E_MOTOR_BRAKE_HOLD
@@ -18,7 +24,7 @@
 #define R_BUMPER  pros::E_CONTROLLER_DIGITAL_R1
 #define R_TRIGGER pros::E_CONTROLLER_DIGITAL_R2
 
-#define L_ANALOG_X pros::E_CONTROLLER_ANALOG_LEFT_X
-#define L_ANALOG_Y pros::E_CONTROLLER_ANALOG_LEFT_Y
-#define R_ANALOG_X pros::E_CONTROLLER_ANALOG_RIGHT_X
-#define R_ANALOG_Y pros::E_CONTROLLER_ANALOG_RIGHT_Y
+#define JOY_LX pros::E_CONTROLLER_ANALOG_LEFT_X
+#define JOY_LY pros::E_CONTROLLER_ANALOG_LEFT_Y
+#define JOY_RX pros::E_CONTROLLER_ANALOG_RIGHT_X
+#define JOY_RY pros::E_CONTROLLER_ANALOG_RIGHT_Y
