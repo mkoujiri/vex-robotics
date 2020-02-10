@@ -60,7 +60,7 @@ void initialize()
 	   this allows for easier stacking.
 	*/
 	arm.set_brake(BRAKE);
-	ramp.set_threshhold(1500, 2500, { 35, -60 });
+	ramp.set_threshold(1500, 2500, { 35, -60 });
 }
 
 void competition_initialize()
