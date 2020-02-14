@@ -49,7 +49,9 @@ class MotorGroup
 
 	// PID execution
 	void set_pid_constants(double kP, double kI, double kD);
+	void set_pid_turn_constants(double kP2, double kI2, double kD2);
 	void move_pid(int position_delta);
+	void turn_pid(int position_delta);
 
 	// movement speeds
 	void set_threshold(int pos_start, int pos_end, std::vector<int> speed);
@@ -66,6 +68,7 @@ class MotorGroup
 
 	// PID constants
 	double kP, kI, kD;
+	double kP2, kI2, kD2;
 };
 
 #endif

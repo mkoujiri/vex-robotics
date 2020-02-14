@@ -135,6 +135,23 @@ void MotorGroup::set_pid_constants(double kP, double kI, double kD)
 	this->kD = kD;
 }
 
+void MotorGroup::set_pid_turn_constants(double kP2, double kI2, double kD2)
+{
+	/*
+	   Assigns the constants of motor group that will
+	   be used in PID (proportional-integral-derivative)
+	   controller.
+
+	   kP is the proportional constants.
+	   kI is the integral scaling constant.
+	   kD is the derivative scaling constant.
+	*/
+
+	this->kP2 = kP2;
+	this->kI2 = kI2;
+	this->kD2 = kD2;
+}
+
 void MotorGroup::move_pid(int position_delta)
 {
 	/*
@@ -149,14 +166,100 @@ void MotorGroup::move_pid(int position_delta)
 
 	// variables used in function
 	const int dT = 10;
+	int error = 0;
+	int prev_error = 0;
+	int power;
+	int integral = 0;
+	int derivative;
+
+	long long start_time = 100000000;
+
+	int count = 0;
+	
+	bool active = false;
+
+	// continue looping while we aren't at end position
+	while(true)
+	{
+		// calculate error
+		error = position_delta - motors[0]->get_position();
+
+		// calculate integral
+		bool passed_setpoint = prev_error > 0 && error < 0 ||
+							   prev_error < 0 && error > 0 || error == 0;
+		// limit integral (check in range or passed setpoint)
+		if(abs(integral) > 2000 || passed_setpoint)
+		{
+			integral = 0;
+		}
+		else
+		{
+			integral += error;
+		}
+
+		if(abs(error - prev_error) < 2)
+		{
+			if(!active)
+			{
+				start_time = pros::millis();
+			}
+			active = true;
+		}
+		else
+		{
+			active = false;
+		}
+
+		printf("%ld + %d + %d \n", abs(error - prev_error), active, integral);
+		if(pros::millis() - start_time > 500 && active)
+		{
+			break;
+		}
+
+		// calculate derivative
+		derivative = error - prev_error;
+		prev_error = error;
+
+		// execute at power
+		power = error * kP + integral * kI + derivative * kD;
+		run(power);
+
+		// wait for poll rate of motors
+		pros::delay(dT);
+	}
+
+	stop();
+
+	// TODO test function
+}
+
+void MotorGroup::turn_pid(int position_delta)
+{
+	/*
+	   Moves motor group to position based off of PID control.
+	   Each motor is run to turn accordingly
+
+	   Uses PID (proportional-integral-derivative) controllers
+	   to accurately and smoothly move to given position.
+	*/
+
+	// reset values of encoders
+	clear_encoders();
+
+	// variables used in function
+	const int dT = 10;
 	int error;
 	int prev_error;
 	int power;
-	int integral;
+	int integral = 0;
 	int derivative;
 
+	long long start_time = 0;
+
+	int count = 0;
+
 	// continue looping while we aren't at end position
-	while(abs(error) > 2)
+	while(true)
 	{
 		// calculate error
 		error = position_delta - motors[0]->get_position();
@@ -167,9 +270,19 @@ void MotorGroup::move_pid(int position_delta)
 		bool passed_setpoint = prev_error > 0 && error < 0 ||
 							   prev_error < 0 && error > 0 || error == 0;
 		// limit integral (check in range or passed setpoint)
-		if(integral > 10000 || passed_setpoint)
+		if(abs(integral) > 10000 || passed_setpoint)
 		{
 			integral = 0;
+		}
+
+		if(abs(error - prev_error) == 0)
+		{
+			start_time = pros::millis();
+		}
+
+		if(pros::millis() - start_time > 300)
+		{
+			break;
 		}
 
 		// calculate derivative
@@ -177,12 +290,20 @@ void MotorGroup::move_pid(int position_delta)
 		prev_error = error;
 
 		// execute at power
-		power = error * kP + integral * kI + derivative * kP;
-		run(power);
+		power = error * kP2 + integral * kI2 + derivative * kD2;
+		std::vector<int> powers;
+		// flip the second half of the speeds
+		for(int i = 0; i < motors.size(); i++)
+		{
+			powers.push_back(power * i < motors.size() / 2 ? 1 : -1);
+		}
+		run(powers);
 
 		// wait for poll rate of motors
 		pros::delay(dT);
 	}
+
+	stop();
 
 	// TODO test function
 }

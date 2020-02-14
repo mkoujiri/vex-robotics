@@ -15,9 +15,5 @@ void autonomous()
 	   Runs in the competition for 15 seconds.
 	*/
 
-	drive.move_pid(1000);
-	pros::delay(500);
-	master.print(0, 0, "distance:%d", drive.get_average_position());
-	pros::delay(500);
 }
 
