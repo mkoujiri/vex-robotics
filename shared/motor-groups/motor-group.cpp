@@ -159,6 +159,8 @@ void MotorGroup::move_pid(int position_delta)
 
 	   Uses PID (proportional-integral-derivative) controllers
 	   to accurately and smoothly move to given position.
+
+	   NOTE: Uses constants kP kI kD.
 	*/
 
 	// reset values of encoders
@@ -172,10 +174,8 @@ void MotorGroup::move_pid(int position_delta)
 	int integral = 0;
 	int derivative;
 
-	long long start_time = 100000000;
+	long long timer = 0;
 
-	int count = 0;
-	
 	bool active = false;
 
 	// continue looping while we aren't at end position
@@ -197,23 +197,35 @@ void MotorGroup::move_pid(int position_delta)
 			integral += error;
 		}
 
-		if(abs(error - prev_error) < 2)
+		// this block controls the completion condition
 		{
-			if(!active)
+			/*
+			   check if delta vel is < 2 degrees and
+			   less than margin of error away from destination.
+			*/
+			if(abs(error - prev_error) < 2 && abs(error) < 10)
 			{
-				start_time = pros::millis();
-			}
-			active = true;
-		}
-		else
-		{
-			active = false;
-		}
+				// activate timer and set to current time
+				if(!active)
+				{
+					active = true;
+					timer = pros::millis();
+				}
 
-		printf("%ld + %d + %d \n", abs(error - prev_error), active, integral);
-		if(pros::millis() - start_time > 500 && active)
-		{
-			break;
+				else
+				{
+					// check if has been stopped in time threshold (ms)
+					if(pros::millis() - timer > 200)
+					{
+						break;
+					}
+				}
+			}
+			else
+			{
+				// disable timer if still moving
+				active = false;
+			}
 		}
 
 		// calculate derivative
@@ -237,10 +249,13 @@ void MotorGroup::turn_pid(int position_delta)
 {
 	/*
 	   Moves motor group to position based off of PID control.
-	   Each motor is run to turn accordingly
+	   Each motor is run to turn accordingly.
 
 	   Uses PID (proportional-integral-derivative) controllers
 	   to accurately and smoothly move to given position.
+
+		NOTE: Uses constants kP2 kI2 kD2.
+		NOTE: Do not use this function, it is not completed.
 	*/
 
 	// reset values of encoders
