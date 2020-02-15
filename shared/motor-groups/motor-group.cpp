@@ -187,10 +187,18 @@ void MotorGroup::move_pid(int position_delta)
 		// calculate integral
 		bool passed_setpoint = prev_error > 0 && error < 0 ||
 							   prev_error < 0 && error > 0 || error == 0;
-		// limit integral (check in range or passed setpoint)
-		if(abs(integral) > 2000 || passed_setpoint)
+		// limit integral by check in desired range or passed setpoint
+		if(pass_setpoint)
 		{
 			integral = 0;
+		}
+		else if(integral > 2000)
+		{
+			integral = 2000;
+		}
+		else if(integral < -2000)
+		{
+			integral = -2000;
 		}
 		else
 		{
