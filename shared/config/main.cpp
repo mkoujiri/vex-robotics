@@ -1,7 +1,5 @@
 #include "main.h"
 
-#include "motor-group.hpp"
-
 /*
    The main file is where the user can define
    various pros functions and establish variables.
@@ -62,8 +60,8 @@ void initialize()
 	arm.set_brake(BRAKE);
 	ramp.set_threshold(1500, 2500, { 35, -60 });
 
-	drive.set_pid_constants(0.20,0.05,3.0);
-	drive.set_pid_turn_constants(0.1,0,0);
+	drive.set_pid_constants(0.20, 0.05, 3.0);
+	drive.set_pid_turn_constants(0.1, 0, 0);
 }
 
 void competition_initialize()

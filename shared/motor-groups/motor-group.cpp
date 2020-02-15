@@ -188,7 +188,7 @@ void MotorGroup::move_pid(int position_delta)
 		bool passed_setpoint = prev_error > 0 && error < 0 ||
 							   prev_error < 0 && error > 0 || error == 0;
 		// limit integral by check in desired range or passed setpoint
-		if(pass_setpoint)
+		if(passed_setpoint)
 		{
 			integral = 0;
 		}
