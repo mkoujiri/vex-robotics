@@ -15,8 +15,7 @@ struct PositionalSpeed
 
 	bool in_pos(int pos)
 	{
-		return pos > pos_start && pos < pos_end ||
-			   pos < pos_start && pos > pos_end;
+		return pos > pos_start && pos < pos_end;
 	}
 };
 
