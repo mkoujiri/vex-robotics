@@ -125,9 +125,15 @@ void MotorGroup::set_pid_constants(double kP, double kI, double kD)
 	   be used in PID (proportional-integral-derivative)
 	   controller.
 
-	   kP is the proportional constants.
-	   kI is the integral scaling constant.
-	   kD is the derivative scaling constant.
+	   kP is the proportional constants that sets the power
+	   according to the distance from the target position.
+
+	   kI is the integral scaling constant, this allows
+	   us to fix steady-state error to assure we aren't
+	   off by the general 15-30 degrees.
+
+	   kD is the derivative scaling constant that slows
+	   the motors prior them reaching their destination.
 	*/
 
 	this->kP = kP;
@@ -142,9 +148,15 @@ void MotorGroup::set_pid_turn_constants(double kP2, double kI2, double kD2)
 	   be used in PID (proportional-integral-derivative)
 	   controller.
 
-	   kP is the proportional constants.
-	   kI is the integral scaling constant.
-	   kD is the derivative scaling constant.
+	   kP2 is the proportional constants that sets the power
+	   according to the distance from the target position.
+
+	   kI2 is the integral scaling constant, this allows
+	   us to fix steady-state error to assure we aren't
+	   off by the general 15-30 degrees.
+
+	   kD2 is the derivative scaling constant that slows
+	   the motors prior them reaching their destination.
 	*/
 
 	this->kP2 = kP2;
