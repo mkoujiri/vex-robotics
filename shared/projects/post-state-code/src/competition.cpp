@@ -15,9 +15,23 @@ void autonomous()
 	   Runs in the competition for 15 seconds.
 	*/
 
+	scooper.run(127);
+	drive.move_pid(2000);
+	drive.move_pid(-1100);
+	scooper.stop();
+	drive.turn_pid(600);
+	drive.move_pid(-1800);
+	drive.turn_pid(-600);
+	scooper.run(127);
+	drive.move_pid(2500,80);
+	scooper.stop();
+	drive.move_pid(-1000);
+	drive.turn_pid(-1300);
 	drive.move_pid(1000);
-	pros::delay(500);
-	master.print(0, 0, "distance:%d", drive.get_average_position());
-	pros::delay(500);
+	while(ramp.get_average_position() < 3000)
+	{
+		ramp.run(true, false);
+	}
+	ramp.stop();
 }
 

@@ -49,7 +49,7 @@ class MotorGroup
 	// PID execution
 	void set_pid_constants(double kP, double kI, double kD);
 	void set_pid_turn_constants(double kP2, double kI2, double kD2);
-	void move_pid(int position_delta);
+	void move_pid(int position_delta, int max_speed = 127);
 	void turn_pid(int position_delta);
 
 	// movement speeds
