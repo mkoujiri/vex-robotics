@@ -17,7 +17,7 @@ void autonomous()
 
 	scooper.run(127);
 	drive.move_pid(2000);
-	drive.move_pid(-1100);
+	drive.move_pid(-1300);
 	scooper.stop();
 	drive.turn_pid(600);
 	drive.move_pid(-1800);

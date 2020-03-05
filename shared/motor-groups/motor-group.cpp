@@ -278,6 +278,139 @@ void MotorGroup::move_pid(int position_delta, int max_speed)
 	// TODO test function
 }
 
+void MotorGroup::move_pid_indices(int position_delta, std::vector<double> mod, std::vector<int> read_idx, int max_speed)
+{
+	/*
+	   Moves motor group to position based off of PID control.
+
+	   Uses PID (proportional-integral-derivative) controllers
+	   to accurately and smoothly move to given position.
+
+	   NOTE: Uses constants kP kI kD.
+	   // TODO finish comment
+	*/
+
+	// reset values of encoders
+	clear_encoders();
+
+	// variables used in function
+	const int dT = 10;
+	int error = 0;
+	int prev_error = 0;
+	int power;
+	int integral = 0;
+	int derivative;
+
+	long long timer = 0;
+
+	bool active = false;
+
+	auto read_index_position = [read_idx, this]() -> int
+	{
+		size_t total = 0;
+		for(size_t i = 0; i < motors.size(); i++)
+		{
+			if(std::find(read_idx.begin(), read_idx.end(), i) != read_idx.end())
+			{
+				total += abs(motors[i]->get_position());
+			}
+		}
+		return total;
+	};
+
+	// continue looping while we aren't at end position
+	while(true)
+	{
+		// calculate error
+		if(position_delta < 0)
+		{
+			error = position_delta + read_index_position();
+		}
+		else
+		{
+			error = position_delta - read_index_position();
+		}
+
+		// calculate integral
+		bool passed_setpoint = prev_error > 0 && error < 0 ||
+							   prev_error < 0 && error > 0;
+		// limit integral by check in desired range or passed setpoint
+		integral += error;
+
+		constexpr double threshold = 500;
+		if(passed_setpoint)
+		{
+			integral = 0;
+		}
+		else if(integral > threshold)
+		{
+			integral = threshold;
+		}
+		else if(integral < -threshold)
+		{
+			integral = -threshold;
+		}
+
+		// this block controls the completion condition
+		{
+			/*
+			   check if delta vel is < 4 degrees and
+			   less than margin of error away from destination.
+			*/
+			if(abs(error - prev_error) < 4 && abs(error) < 4)
+			{
+				// activate timer and set to current time
+				if(!active)
+				{
+					active = true;
+					timer = pros::millis();
+				}
+				else
+				{
+					// check if has been stopped in time threshold (ms)
+					if(pros::millis() - timer > 50)
+					{
+						break;
+					}
+				}
+			}
+			else
+			{
+				// disable timer if still moving
+				active = false;
+			}
+		}
+
+		// calculate derivative
+		derivative = error - prev_error;
+		prev_error = error;
+
+		// execute at power
+		power = error * kP + integral * kI + derivative * kD;
+		if(power > max_speed)
+		{
+			power = max_speed;
+		}
+		else if(power < -max_speed)
+		{
+			power = -max_speed;
+		}
+		std::vector<int> powers;
+		for(size_t i = 0; i < motors.size(); i++)
+		{
+			powers.push_back(power * mod[i]);
+		}
+		run(powers);
+
+		// wait for poll rate of motors
+		pros::delay(dT);
+	}
+
+	stop();
+
+	// TODO test function
+}
+
 void MotorGroup::turn_pid(int position_delta)
 {
 	/*
