@@ -49,9 +49,13 @@ class MotorGroup
 	// PID execution
 	void set_pid_constants(double kP, double kI, double kD);
 	void set_pid_turn_constants(double kP2, double kI2, double kD2);
-	void move_pid(int position_delta, int max_speed = 127);
-	void move_pid_indices(int position_delta, std::vector<double> mod, std::vector<int> read_idx, int max_speed = 127);
-	void turn_pid(int position_delta);
+	void move_pid(int position_delta, int max_speed = 127,
+				  const int error_threshold = 2);
+	void move_pid_indices(int position_delta, std::vector<double> mod,
+						  std::vector<int> read_idx, int max_speed = 127,
+						  const int error_threshold = 2);
+	void turn_pid(int position_delta, int max_speed = 127,
+				  const int error_threshold = 2);
 
 	// movement speeds
 	void set_threshold(int pos_start, int pos_end, std::vector<int> speed);

@@ -164,7 +164,8 @@ void MotorGroup::set_pid_turn_constants(double kP2, double kI2, double kD2)
 	this->kD2 = kD2;
 }
 
-void MotorGroup::move_pid(int position_delta, int max_speed)
+void MotorGroup::move_pid(int position_delta, int max_speed,
+						  const int error_threshold)
 {
 	/*
 	   Moves motor group to position based off of PID control.
@@ -173,6 +174,8 @@ void MotorGroup::move_pid(int position_delta, int max_speed)
 	   to accurately and smoothly move to given position.
 
 	   NOTE: Uses constants kP kI kD.
+
+	   error_threshold is the accuracy goal within n degrees.
 	*/
 
 	// reset values of encoders
@@ -204,23 +207,23 @@ void MotorGroup::move_pid(int position_delta, int max_speed)
 		}
 
 		// calculate integral
-		bool passed_setpoint = prev_error > 0 && error < 0 ||
-							   prev_error < 0 && error > 0;
+		bool passed_setpoint =
+			prev_error > 0 && error < 0 || prev_error < 0 && error > 0;
 		// limit integral by check in desired range or passed setpoint
 		integral += error;
 
-		constexpr double threshold = 500;
+		constexpr double integral_threshold = 500;
 		if(passed_setpoint)
 		{
 			integral = 0;
 		}
-		else if(integral > threshold)
+		else if(integral > integral_threshold)
 		{
-			integral = threshold;
+			integral = integral_threshold;
 		}
-		else if(integral < -threshold)
+		else if(integral < -integral_threshold)
 		{
-			integral = -threshold;
+			integral = -integral_threshold;
 		}
 
 		// this block controls the completion condition
@@ -274,11 +277,11 @@ void MotorGroup::move_pid(int position_delta, int max_speed)
 	}
 
 	stop();
-
-	// TODO test function
 }
 
-void MotorGroup::move_pid_indices(int position_delta, std::vector<double> mod, std::vector<int> read_idx, int max_speed)
+void MotorGroup::move_pid_indices(int position_delta, std::vector<double> mod,
+								  std::vector<int> read_idx, int max_speed,
+								  const int error_threshold)
 {
 	/*
 	   Moves motor group to position based off of PID control.
@@ -287,7 +290,21 @@ void MotorGroup::move_pid_indices(int position_delta, std::vector<double> mod, s
 	   to accurately and smoothly move to given position.
 
 	   NOTE: Uses constants kP kI kD.
-	   // TODO finish comment
+
+	   error_threshold is the accuracy goal within n degrees.
+
+	   This variant of the move_pid function easily allows
+	   collectively running part of the entire set of
+	   motors (specificed by the mod parameter).  mod
+	   will multiply each motor by a position so for
+	   example, {1,1,0.5,0.5} would allow for a coasting
+	   motion (in a 4wd train).
+
+	   Resulting from this motion might produce error
+	   in quadratic-encoder reading.  In order to combat
+	   this, read_idx is available.  read_idx is a list
+	   of motor indices that the reading will be averaged
+	   from.
 	*/
 
 	// reset values of encoders
@@ -305,8 +322,7 @@ void MotorGroup::move_pid_indices(int position_delta, std::vector<double> mod, s
 
 	bool active = false;
 
-	auto read_index_position = [read_idx, this]() -> int
-	{
+	auto read_index_position = [read_idx, this]() -> int {
 		size_t total = 0;
 		for(size_t i = 0; i < motors.size(); i++)
 		{
@@ -332,23 +348,23 @@ void MotorGroup::move_pid_indices(int position_delta, std::vector<double> mod, s
 		}
 
 		// calculate integral
-		bool passed_setpoint = prev_error > 0 && error < 0 ||
-							   prev_error < 0 && error > 0;
+		bool passed_setpoint =
+			prev_error > 0 && error < 0 || prev_error < 0 && error > 0;
 		// limit integral by check in desired range or passed setpoint
 		integral += error;
 
-		constexpr double threshold = 500;
+		constexpr double integral_threshold = 500;
 		if(passed_setpoint)
 		{
 			integral = 0;
 		}
-		else if(integral > threshold)
+		else if(integral > integral_threshold)
 		{
-			integral = threshold;
+			integral = integral_threshold;
 		}
-		else if(integral < -threshold)
+		else if(integral < -integral_threshold)
 		{
-			integral = -threshold;
+			integral = -integral_threshold;
 		}
 
 		// this block controls the completion condition
@@ -407,11 +423,10 @@ void MotorGroup::move_pid_indices(int position_delta, std::vector<double> mod, s
 	}
 
 	stop();
-
-	// TODO test function
 }
 
-void MotorGroup::turn_pid(int position_delta)
+void MotorGroup::turn_pid(int position_delta, int max_speed,
+						  const int error_threshold)
 {
 	/*
 	   Moves motor group to position based off of PID control.
@@ -420,8 +435,9 @@ void MotorGroup::turn_pid(int position_delta)
 	   Uses PID (proportional-integral-derivative) controllers
 	   to accurately and smoothly move to given position.
 
-		NOTE: Uses constants kP2 kI2 kD2.
-		NOTE: Do not use this function, it is not completed.
+	   NOTE: Uses constants kP2 kI2 kD2.
+
+	   error_threshold is the accuracy goal within n degrees.
 	*/
 
 	// reset values of encoders
@@ -453,8 +469,8 @@ void MotorGroup::turn_pid(int position_delta)
 		}
 
 		// calculate integral
-		bool passed_setpoint = prev_error > 0 && error < 0 ||
-							   prev_error < 0 && error > 0;
+		bool passed_setpoint =
+			prev_error > 0 && error < 0 || prev_error < 0 && error > 0;
 		// limit integral by check in desired range or passed setpoint
 		integral += error;
 
@@ -478,7 +494,8 @@ void MotorGroup::turn_pid(int position_delta)
 			   check if delta vel is < 2 degrees and
 			   less than margin of error away from destination.
 			*/
-			if(abs(error - prev_error) < 2 && abs(error) < 2)
+			if(abs(error - prev_error) < error_threshold &&
+			   abs(error) < error_threshold)
 			{
 				// activate timer and set to current time
 				if(!active)
@@ -508,14 +525,13 @@ void MotorGroup::turn_pid(int position_delta)
 
 		// execute at power
 		power = error * kP2 + integral * kI2 + derivative * kD2;
-		constexpr int max_speed = 75;
-		if(power > 75)
+		if(power > max_speed)
 		{
-			power = 75;
+			power = max_speed;
 		}
-		else if(power < -75)
+		else if(power < -max_speed)
 		{
-			power = -75;
+			power = -max_speed;
 		}
 		std::vector<int> powers;
 		for(size_t i = 0; i < motors.size() / 2; i++)
@@ -533,8 +549,6 @@ void MotorGroup::turn_pid(int position_delta)
 	}
 
 	stop();
-
-	// TODO test function
 }
 
 void MotorGroup::set_threshold(int start_pos, int end_pos,
