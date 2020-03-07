@@ -229,10 +229,11 @@ void MotorGroup::move_pid(int position_delta, int max_speed,
 		// this block controls the completion condition
 		{
 			/*
-			   check if delta vel is < 4 degrees and
+			   check if delta vel is < error_threshold degrees and
 			   less than margin of error away from destination.
 			*/
-			if(abs(error - prev_error) < 4 && abs(error) < 4)
+			if(abs(error - prev_error) < error_threshold &&
+			   abs(error) < error_threshold)
 			{
 				// activate timer and set to current time
 				if(!active)
@@ -370,10 +371,11 @@ void MotorGroup::move_pid_indices(int position_delta, std::vector<double> mod,
 		// this block controls the completion condition
 		{
 			/*
-			   check if delta vel is < 4 degrees and
+			   check if delta vel is < error_threshold degrees and
 			   less than margin of error away from destination.
 			*/
-			if(abs(error - prev_error) < 4 && abs(error) < 4)
+			if(abs(error - prev_error) < error_threshold &&
+			   abs(error) < error_threshold)
 			{
 				// activate timer and set to current time
 				if(!active)
